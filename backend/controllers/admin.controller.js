@@ -1,0 +1,323 @@
+import Seat from '../models/Seat.model.js';
+import Booking from '../models/Booking.model.js';
+import User from '../models/User.model.js';
+
+// Seat Management
+export const createSeat = async (req, res, next) => {
+  try {
+    const { seatNumber, row, column, section, status } = req.body;
+
+    const existingSeat = await Seat.findOne({ seatNumber });
+    if (existingSeat) {
+      return res.status(400).json({ message: 'Seat with this number already exists' });
+    }
+
+    const seat = new Seat({
+      seatNumber,
+      row,
+      column,
+      section,
+      status: status || 'available',
+    });
+
+    await seat.save();
+    res.status(201).json({ message: 'Seat created successfully', seat });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createMultipleSeats = async (req, res, next) => {
+  try {
+    const { seats } = req.body;
+
+    if (!Array.isArray(seats) || seats.length === 0) {
+      return res.status(400).json({ message: 'Seats array is required' });
+    }
+
+    const createdSeats = [];
+    const errors = [];
+
+    for (const seatData of seats) {
+      try {
+        const existingSeat = await Seat.findOne({ seatNumber: seatData.seatNumber });
+        if (existingSeat) {
+          errors.push({ seatNumber: seatData.seatNumber, error: 'Already exists' });
+          continue;
+        }
+
+        const seat = new Seat(seatData);
+        await seat.save();
+        createdSeats.push(seat);
+      } catch (error) {
+        errors.push({ seatNumber: seatData.seatNumber, error: error.message });
+      }
+    }
+
+    res.status(201).json({
+      message: `Created ${createdSeats.length} seats`,
+      createdSeats,
+      errors: errors.length > 0 ? errors : undefined,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateSeat = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { status, isActive } = req.body;
+
+    const seat = await Seat.findById(id);
+    if (!seat) {
+      return res.status(404).json({ message: 'Seat not found' });
+    }
+
+    if (status !== undefined) {
+      seat.status = status;
+    }
+
+    if (isActive !== undefined) {
+      seat.isActive = isActive;
+    }
+
+    await seat.save();
+    res.json({ message: 'Seat updated successfully', seat });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteSeat = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const seat = await Seat.findById(id);
+    if (!seat) {
+      return res.status(404).json({ message: 'Seat not found' });
+    }
+
+    // Check if seat has active bookings
+    const activeBookings = await Booking.find({
+      status: 'active',
+      seats: id,
+      endDate: { $gte: new Date() },
+    });
+
+    if (activeBookings.length > 0) {
+      return res.status(400).json({
+        message: 'Cannot delete seat with active bookings',
+      });
+    }
+
+    await Seat.findByIdAndDelete(id);
+    res.json({ message: 'Seat deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Booking Management
+export const getAllBookings = async (req, res, next) => {
+  try {
+    const { status, startDate, endDate, userId } = req.query;
+    const query = {};
+
+    if (status) {
+      query.status = status;
+    }
+
+    if (startDate || endDate) {
+      query.$or = [];
+      if (startDate) {
+        query.$or.push({ startDate: { $gte: new Date(startDate) } });
+      }
+      if (endDate) {
+        query.$or.push({ endDate: { $lte: new Date(endDate) } });
+      }
+    }
+
+    if (userId) {
+      query.user = userId;
+    }
+
+    const bookings = await Booking.find(query)
+      .populate('user', 'name email')
+      .populate('seats', 'seatNumber row column section')
+      .sort({ createdAt: -1 });
+
+    res.json({ bookings });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const cancelBookingAdmin = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const booking = await Booking.findById(id).populate('seats');
+
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    if (booking.status === 'cancelled') {
+      return res.status(400).json({ message: 'Booking is already cancelled' });
+    }
+
+    booking.status = 'cancelled';
+    await booking.save();
+
+    res.json({ message: 'Booking cancelled successfully', booking });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Reports
+export const getMonthlyReport = async (req, res, next) => {
+  try {
+    const { month, year } = req.query;
+    const targetMonth = month ? parseInt(month) : new Date().getMonth() + 1;
+    const targetYear = year ? parseInt(year) : new Date().getFullYear();
+
+    const startDate = new Date(targetYear, targetMonth - 1, 1);
+    const endDate = new Date(targetYear, targetMonth, 0, 23, 59, 59);
+
+    const bookings = await Booking.find({
+      status: 'active',
+      $or: [
+        {
+          startDate: { $lte: endDate },
+          endDate: { $gte: startDate },
+        },
+      ],
+    })
+      .populate('user', 'name email')
+      .populate('seats', 'seatNumber row column section');
+
+    const totalBookings = bookings.length;
+    const totalRevenue = bookings.reduce((sum, booking) => sum + booking.totalAmount, 0);
+    const totalSeatsBooked = bookings.reduce((sum, booking) => sum + booking.seats.length, 0);
+
+    res.json({
+      month: targetMonth,
+      year: targetYear,
+      totalBookings,
+      totalRevenue,
+      totalSeatsBooked,
+      bookings,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getDashboardStats = async (req, res, next) => {
+  try {
+    const totalUsers = await User.countDocuments({ role: 'user' });
+    const totalSeats = await Seat.countDocuments({ isActive: true });
+    const availableSeats = await Seat.countDocuments({ isActive: true, status: 'available' });
+    const lockedSeats = await Seat.countDocuments({ status: 'locked' });
+    const activeBookings = await Booking.countDocuments({ status: 'active' });
+    const totalBookings = await Booking.countDocuments();
+
+    const currentMonth = new Date();
+    currentMonth.setDate(1);
+    currentMonth.setHours(0, 0, 0, 0);
+
+    const monthlyRevenue = await Booking.aggregate([
+      {
+        $match: {
+          status: 'active',
+          createdAt: { $gte: currentMonth },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: '$totalAmount' },
+        },
+      },
+    ]);
+
+    // Calculate occupancy rate
+    const bookedSeatsCount = await Booking.aggregate([
+      {
+        $match: {
+          status: 'active',
+          startDate: { $lte: new Date() },
+          endDate: { $gte: new Date() },
+        },
+      },
+      {
+        $unwind: '$seats',
+      },
+      {
+        $group: {
+          _id: '$seats',
+        },
+      },
+      {
+        $count: 'count',
+      },
+    ]);
+
+    const currentlyBooked = bookedSeatsCount[0]?.count || 0;
+    const occupancyRate = totalSeats > 0 ? ((currentlyBooked / totalSeats) * 100).toFixed(1) : 0;
+
+    res.json({
+      totalUsers,
+      totalSeats,
+      availableSeats,
+      lockedSeats,
+      activeBookings,
+      totalBookings,
+      monthlyRevenue: monthlyRevenue[0]?.total || 0,
+      currentlyBooked,
+      occupancyRate: parseFloat(occupancyRate),
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const forceReleaseSeat = async (req, res, next) => {
+  try {
+    const { seatId } = req.body;
+
+    if (!seatId) {
+      return res.status(400).json({ message: 'Seat ID is required' });
+    }
+
+    const seat = await Seat.findById(seatId);
+    if (!seat) {
+      return res.status(404).json({ message: 'Seat not found' });
+    }
+
+    // Cancel all active bookings for this seat
+    const activeBookings = await Booking.find({
+      status: 'active',
+      seats: seatId,
+    });
+
+    for (const booking of activeBookings) {
+      booking.status = 'cancelled';
+      await booking.save();
+    }
+
+    // Unlock the seat
+    seat.status = 'available';
+    await seat.save();
+
+    res.json({
+      message: 'Seat force-released successfully',
+      cancelledBookings: activeBookings.length,
+      seat,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+

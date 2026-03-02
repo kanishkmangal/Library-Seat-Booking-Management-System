@@ -1,0 +1,156 @@
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { format } from 'date-fns';
+import { bookingAPI } from '../../services/api';
+
+const BookingHistory = () => {
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('all');
+
+  useEffect(() => {
+    loadBookings();
+  }, [filter]);
+
+  const loadBookings = async () => {
+    try {
+      setLoading(true);
+      const params = filter !== 'all' ? { status: filter } : {};
+      const response = await bookingAPI.getAll(params);
+      setBookings(response.data.bookings);
+    } catch (error) {
+      console.error('Failed to load bookings:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancel = async (bookingId) => {
+    if (!window.confirm('Are you sure you want to cancel this booking?')) {
+      return;
+    }
+
+    try {
+      await bookingAPI.cancel(bookingId);
+      loadBookings();
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to cancel booking');
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'active':
+        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+      case 'completed':
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-400';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  if (loading) {
+    return <div className="text-center py-12">Loading bookings...</div>;
+  }
+
+  return (
+    <div className="max-w-6xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6">My Bookings</h1>
+
+      <div className="mb-4">
+        <select
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+        >
+          <option value="all">All Bookings</option>
+          <option value="active">Active</option>
+          <option value="cancelled">Cancelled</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+
+      {bookings.length === 0 ? (
+        <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+          <p className="text-gray-600 dark:text-gray-400">No bookings found</p>
+          <Link
+            to="/booking"
+            className="mt-4 inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Book a Seat
+          </Link>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {bookings.map((booking) => (
+            <div
+              key={booking._id}
+              className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6"
+            >
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="text-xl font-semibold">Booking ID: {booking.bookingId}</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    {format(new Date(booking.startDate), 'MMM dd, yyyy')} -{' '}
+                    {format(new Date(booking.endDate), 'MMM dd, yyyy')}
+                  </p>
+                </div>
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
+                    booking.status
+                  )}`}
+                >
+                  {booking.status.toUpperCase()}
+                </span>
+              </div>
+
+              <div className="mb-4">
+                <p className="text-sm font-medium mb-2">Seats:</p>
+                <div className="flex flex-wrap gap-2">
+                  {booking.seats.map((seat) => (
+                    <span
+                      key={seat._id}
+                      className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 rounded-full text-sm"
+                    >
+                      {seat.seatNumber} ({seat.section})
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Duration: {booking.durationMonths} month(s)
+                  </p>
+                  <p className="text-lg font-semibold mt-1">Total: ₹{booking.totalAmount}</p>
+                </div>
+                <div className="flex gap-2">
+                  {booking.status === 'active' && (
+                    <button
+                      onClick={() => handleCancel(booking._id)}
+                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                  <Link
+                    to={`/booking/confirmation/${booking.bookingId}`}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    View Details
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default BookingHistory;
+
