@@ -147,21 +147,18 @@ const SeatSelection = () => {
         return;
       }
 
-      const response = await bookingAPI.create({
-        seatIds: seatIdsArray,
-        startDate: selectedDate,
-        durationMonths,
+      // Instead of creating booking, navigate to details page
+      navigate('/booking/details', {
+        state: {
+          selectedSeats: selectedSeatDetails,
+          startDate: selectedDate,
+          durationMonths,
+        },
       });
-
-      showToast('Booking confirmed!', 'success');
-
-      setTimeout(() => {
-        navigate(`/booking/confirmation/${response.data.booking.bookingId}`);
-      }, 400);
     } catch (err) {
-      console.error('Booking error:', err);
+      console.error('Lock error:', err);
       showToast(
-        err?.response?.data?.message || 'Failed to create booking',
+        err?.response?.data?.message || 'Failed to process request',
         'error'
       );
       await loadSeatLayout();
@@ -242,6 +239,7 @@ const SeatSelection = () => {
               onConfirm={handleConfirm}
               loading={submitting}
               date={selectedDate}
+              confirmButtonText="Click to Proceed"
             />
           </div>
         </div>
@@ -255,6 +253,7 @@ const SeatSelection = () => {
             onConfirm={handleConfirm}
             loading={submitting}
             date={selectedDate}
+            confirmButtonText="Click to Proceed"
           />
         </div>
       </div>

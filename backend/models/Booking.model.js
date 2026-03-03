@@ -14,9 +14,15 @@ const bookingSchema = new mongoose.Schema(
     },
     seats: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Seat',
-        required: true,
+        seat: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Seat',
+          required: true,
+        },
+        name: { type: String, required: true },
+        fatherName: { type: String, required: true },
+        contactNumber: { type: String, required: true },
+        address: { type: String, required: true },
       },
     ],
     startDate: {
@@ -59,7 +65,7 @@ bookingSchema.pre('save', async function (next) {
     const overlappingBookings = await Booking.find({
       _id: { $ne: this._id },
       status: 'active',
-      seats: { $in: this.seats },
+      seats: { $in: this.seats.map(s => s.seat) },
       $or: [
         {
           startDate: { $lt: this.endDate },

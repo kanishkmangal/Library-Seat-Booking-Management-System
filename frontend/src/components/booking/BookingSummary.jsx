@@ -7,6 +7,7 @@ const BookingSummary = ({
   onConfirm,
   loading,
   date,
+  confirmButtonText = 'Confirm Booking',
 }) => {
   const basePrice = 500;
   const total = selectedSeats.length * durationMonths * basePrice;
@@ -83,7 +84,7 @@ const BookingSummary = ({
             Processing...
           </span>
         ) : (
-          'Confirm Booking'
+          confirmButtonText
         )}
       </button>
 

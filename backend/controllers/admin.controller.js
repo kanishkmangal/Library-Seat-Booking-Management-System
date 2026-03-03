@@ -149,7 +149,7 @@ export const getAllBookings = async (req, res, next) => {
     const total = await Booking.countDocuments(query);
     const bookings = await Booking.find(query)
       .populate('user', 'name email')
-      .populate('seats', 'seatNumber row column section')
+      .populate('seats.seat', 'seatNumber genderType row section')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -171,7 +171,7 @@ export const getAllBookings = async (req, res, next) => {
 export const cancelBookingAdmin = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const booking = await Booking.findById(id).populate('seats');
+    const booking = await Booking.findById(id).populate('seats.seat');
 
     if (!booking) {
       return res.status(404).json({ message: 'Booking not found' });
@@ -214,7 +214,7 @@ export const getMonthlyReport = async (req, res, next) => {
     const total = await Booking.countDocuments(query);
     const bookings = await Booking.find(query)
       .populate('user', 'name email')
-      .populate('seats', 'seatNumber row column section')
+      .populate('seats.seat', 'seatNumber genderType row section')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -297,7 +297,7 @@ export const getDashboardStats = async (req, res, next) => {
       },
       {
         $group: {
-          _id: '$seats',
+          _id: '$seats.seat',
         },
       },
       {
@@ -340,7 +340,7 @@ export const forceReleaseSeat = async (req, res, next) => {
     // Cancel all active bookings for this seat
     const activeBookings = await Booking.find({
       status: 'active',
-      seats: seatId,
+      'seats.seat': seatId,
     });
 
     for (const booking of activeBookings) {

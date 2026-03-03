@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { adminAPI } from '../../services/api';
 import Pagination from '../../components/common/Pagination';
 
 const AdminBookings = () => {
+  const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({
@@ -138,7 +140,8 @@ const AdminBookings = () => {
           {bookings.map((booking) => (
             <div
               key={booking._id}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6"
+              onClick={() => navigate(`/booking/${booking._id}`)}
+              className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
             >
               <div className="flex justify-between items-start mb-4">
                 <div>
@@ -163,12 +166,13 @@ const AdminBookings = () => {
               <div className="mb-4">
                 <p className="text-sm font-medium mb-2">Seats:</p>
                 <div className="flex flex-wrap gap-2">
-                  {booking.seats.map((seat) => (
+                  {booking.seats.map((item) => (
                     <span
-                      key={seat._id}
+                      key={item.seat?._id || Math.random()}
                       className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 rounded-full text-sm"
+                      title={item.name ? `${item.name} (${item.contactNumber})` : 'No details'}
                     >
-                      {seat.seatNumber} ({seat.section})
+                      {item.seat ? `${item.seat.seatNumber} (${item.seat.genderType?.toUpperCase() || item.seat.section})` : 'Unknown Seat'}
                     </span>
                   ))}
                 </div>

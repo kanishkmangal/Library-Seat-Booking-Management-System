@@ -8,7 +8,7 @@ export const generateBookingId = () => {
 export const checkSeatAvailability = async (seatIds, startDate, endDate, userGender) => {
   const overlappingBookings = await Booking.find({
     status: 'active',
-    seats: { $in: seatIds },
+    'seats.seat': { $in: seatIds },
     $or: [
       {
         startDate: { $lte: endDate },

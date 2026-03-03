@@ -51,12 +51,14 @@ export const getSeatLayout = async (req, res, next) => {
       status: 'active',
       startDate: { $lte: queryDate },
       endDate: { $gte: queryDate },
-    }).populate('seats');
+    }).populate('seats.seat');
 
     const bookedSeatIds = new Set();
     bookings.forEach((booking) => {
-      booking.seats.forEach((seat) => {
-        bookedSeatIds.add(seat._id.toString());
+      booking.seats.forEach((item) => {
+        if (item.seat && item.seat._id) {
+          bookedSeatIds.add(item.seat._id.toString());
+        }
       });
     });
 

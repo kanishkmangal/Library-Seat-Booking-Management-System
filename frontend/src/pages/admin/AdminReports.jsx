@@ -138,7 +138,7 @@ const AdminReports = () => {
                           {booking.user?.name}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          {booking.seats.map((s) => s.seatNumber).join(', ')}
+                          {booking.seats.filter(s => s.seat).map((s) => `${s.seat.seatNumber} (${s.seat.genderType?.toUpperCase() || s.seat.section})`).join(', ')}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           {booking.durationMonths} month(s)

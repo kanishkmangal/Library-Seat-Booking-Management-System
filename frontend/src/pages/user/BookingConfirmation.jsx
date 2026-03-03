@@ -94,13 +94,19 @@ const BookingConfirmation = () => {
           <div className="border-b border-gray-200 dark:border-gray-700 pb-4">
             <h2 className="text-lg font-semibold mb-2">Seats</h2>
             <div className="flex flex-wrap gap-2">
-              {booking.seats.map((seat) => (
-                <span
-                  key={seat._id}
-                  className="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 rounded-lg font-medium"
-                >
-                  {seat.seatNumber} ({seat.section})
-                </span>
+              {booking.seats.filter(item => item.seat).map((item) => (
+                <div key={item.seat._id} className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-100 dark:border-gray-700">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 rounded-lg font-medium text-sm">
+                      Seat {item.seat.seatNumber} ({item.seat.genderType?.toUpperCase() || item.seat.section})
+                    </span>
+                  </div>
+                  <div className="space-y-1 text-xs text-gray-600 dark:text-gray-400">
+                    <p><span className="font-medium">Passenger:</span> {item.name}</p>
+                    <p><span className="font-medium">Father:</span> {item.fatherName}</p>
+                    <p><span className="font-medium">Contact:</span> {item.contactNumber}</p>
+                  </div>
+                </div>
               ))}
             </div>
           </div>

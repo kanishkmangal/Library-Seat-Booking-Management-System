@@ -10,6 +10,8 @@ import DateSelection from './pages/user/DateSelection';
 import SeatSelection from './pages/user/SeatSelection';
 import BookingHistory from './pages/user/BookingHistory';
 import BookingConfirmation from './pages/user/BookingConfirmation';
+import SeatDetails from './pages/user/SeatDetails';
+import BookingDetails from './pages/user/BookingDetails';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminSeats from './pages/admin/AdminSeats';
 import AdminBookings from './pages/admin/AdminBookings';
@@ -68,6 +70,14 @@ function App() {
               }
             />
             <Route
+              path="/booking/details"
+              element={
+                <ProtectedRoute>
+                  <SeatDetails />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/booking/history"
               element={
                 <ProtectedRoute>
@@ -80,6 +90,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <BookingConfirmation />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/booking/:id"
+              element={
+                <ProtectedRoute>
+                  <BookingDetails />
                 </ProtectedRoute>
               }
             />
