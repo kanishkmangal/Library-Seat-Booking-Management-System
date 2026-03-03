@@ -122,6 +122,10 @@ export const deleteSeat = async (req, res, next) => {
 export const getAllBookings = async (req, res, next) => {
   try {
     const { status, startDate, endDate, userId } = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
     const query = {};
 
     if (status) {
@@ -142,12 +146,23 @@ export const getAllBookings = async (req, res, next) => {
       query.user = userId;
     }
 
+    const total = await Booking.countDocuments(query);
     const bookings = await Booking.find(query)
       .populate('user', 'name email')
       .populate('seats', 'seatNumber row column section')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
-    res.json({ bookings });
+    res.json({
+      bookings,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
     next(error);
   }
@@ -182,10 +197,11 @@ export const getMonthlyReport = async (req, res, next) => {
     const targetMonth = month ? parseInt(month) : new Date().getMonth() + 1;
     const targetYear = year ? parseInt(year) : new Date().getFullYear();
 
-    const startDate = new Date(targetYear, targetMonth - 1, 1);
-    const endDate = new Date(targetYear, targetMonth, 0, 23, 59, 59);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
 
-    const bookings = await Booking.find({
+    const query = {
       status: 'active',
       $or: [
         {
@@ -193,21 +209,46 @@ export const getMonthlyReport = async (req, res, next) => {
           endDate: { $gte: startDate },
         },
       ],
-    })
-      .populate('user', 'name email')
-      .populate('seats', 'seatNumber row column section');
+    };
 
-    const totalBookings = bookings.length;
-    const totalRevenue = bookings.reduce((sum, booking) => sum + booking.totalAmount, 0);
-    const totalSeatsBooked = bookings.reduce((sum, booking) => sum + booking.seats.length, 0);
+    const total = await Booking.countDocuments(query);
+    const bookings = await Booking.find(query)
+      .populate('user', 'name email')
+      .populate('seats', 'seatNumber row column section')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    // Calculate stats for the WHOLE month (without skip/limit)
+    // This could be heavy, but usually reports need totals.
+    // For now, I'll just return the paginated list and use the total count for pagination.
+    // If the user needs totalRevenue for the whole month, I should aggregate it.
+
+    // Aggregation for totals
+    const stats = await Booking.aggregate([
+      { $match: query },
+      {
+        $group: {
+          _id: null,
+          totalRevenue: { $sum: '$totalAmount' },
+          totalSeats: { $sum: { $size: '$seats' } },
+        },
+      },
+    ]);
 
     res.json({
       month: targetMonth,
       year: targetYear,
-      totalBookings,
-      totalRevenue,
-      totalSeatsBooked,
+      totalBookings: total,
+      totalRevenue: stats[0]?.totalRevenue || 0,
+      totalSeatsBooked: stats[0]?.totalSeats || 0,
       bookings,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
     next(error);

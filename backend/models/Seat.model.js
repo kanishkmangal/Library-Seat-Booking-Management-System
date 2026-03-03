@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const seatSchema = new mongoose.Schema(
   {
     seatNumber: {
-      type: String,
+      type: Number,
       required: [true, 'Seat number is required'],
       unique: true,
     },
@@ -18,6 +18,11 @@ const seatSchema = new mongoose.Schema(
     section: {
       type: String,
       required: [true, 'Section is required'],
+    },
+    genderType: {
+      type: String,
+      enum: ['male', 'female'],
+      default: 'male',
     },
     status: {
       type: String,

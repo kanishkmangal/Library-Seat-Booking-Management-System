@@ -4,6 +4,10 @@ import Booking from '../models/Booking.model.js';
 export const getAllSeats = async (req, res, next) => {
   try {
     const { section, status } = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
     const query = { isActive: true };
 
     if (section) {
@@ -14,9 +18,21 @@ export const getAllSeats = async (req, res, next) => {
       query.status = status;
     }
 
-    const seats = await Seat.find(query).sort({ row: 1, column: 1 });
+    const total = await Seat.countDocuments(query);
+    const seats = await Seat.find(query)
+      .sort({ seatNumber: 1 })
+      .skip(skip)
+      .limit(limit);
 
-    res.json({ seats });
+    res.json({
+      seats,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
     next(error);
   }
@@ -43,7 +59,7 @@ export const getSeatLayout = async (req, res, next) => {
         bookedSeatIds.add(seat._id.toString());
       });
     });
-   
+
     // Map seats with availability status
     const seatLayout = seats.map((seat) => {
       const isBooked = bookedSeatIds.has(seat._id.toString());
@@ -53,6 +69,7 @@ export const getSeatLayout = async (req, res, next) => {
         row: seat.row,
         column: seat.column,
         section: seat.section,
+        genderType: seat.genderType,
         status: isBooked ? 'booked' : seat.status,
       };
     });

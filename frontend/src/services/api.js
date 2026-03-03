@@ -74,8 +74,8 @@ api.interceptors.response.use(
 );
 
 export const authAPI = {
-  register: (name, email, password) =>
-    api.post('/auth/register', { name, email, password }),
+  register: (name, email, password, gender) =>
+    api.post('/auth/register', { name, email, password, gender }),
   login: (email, password) => {
     return api.post('/auth/login', { email, password }).catch((error) => {
       // Ensure error is properly formatted

@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const response = await authAPI.login(email, password);
-      
+
       if (!response || !response.data) {
         return {
           success: false,
@@ -72,15 +72,15 @@ export const AuthProvider = ({ children }) => {
       return { success: true };
     } catch (error) {
       console.error('Login error:', error);
-      
+
       // Handle different error types
       let errorMessage = 'Login failed';
-      
+
       if (error.response) {
         // Server responded with error
-        errorMessage = error.response.data?.message || 
-                      error.response.data?.error || 
-                      `Server error: ${error.response.status}`;
+        errorMessage = error.response.data?.message ||
+          error.response.data?.error ||
+          `Server error: ${error.response.status}`;
       } else if (error.request) {
         // Request made but no response
         errorMessage = 'No response from server. Please check if the backend is running.';
@@ -96,9 +96,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (name, email, password) => {
+  const register = async (name, email, password, gender) => {
     try {
-      const response = await authAPI.register(name, email, password);
+      const response = await authAPI.register(name, email, password, gender);
       const { user: userData, accessToken, refreshToken } = response.data;
 
       localStorage.setItem('accessToken', accessToken);

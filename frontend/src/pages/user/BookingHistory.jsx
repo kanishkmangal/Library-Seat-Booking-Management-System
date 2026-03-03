@@ -2,27 +2,53 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { bookingAPI } from '../../services/api';
+import Pagination from '../../components/common/Pagination';
 
 const BookingHistory = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 1,
+  });
   const [filter, setFilter] = useState('all');
 
   useEffect(() => {
-    loadBookings();
+    // Reset to page 1 when filter changes
+    setPagination((prev) => ({ ...prev, page: 1 }));
   }, [filter]);
+
+  useEffect(() => {
+    loadBookings();
+  }, [filter, pagination.page, pagination.limit]);
 
   const loadBookings = async () => {
     try {
       setLoading(true);
-      const params = filter !== 'all' ? { status: filter } : {};
+      const params = {
+        page: pagination.page,
+        limit: pagination.limit,
+      };
+      if (filter !== 'all') params.status = filter;
+
       const response = await bookingAPI.getAll(params);
       setBookings(response.data.bookings);
+      setPagination(response.data.pagination);
     } catch (error) {
       console.error('Failed to load bookings:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePageChange = (newPage) => {
+    setPagination((prev) => ({ ...prev, page: newPage }));
+  };
+
+  const handleLimitChange = (newLimit) => {
+    setPagination((prev) => ({ ...prev, limit: newLimit, page: 1 }));
   };
 
   const handleCancel = async (bookingId) => {
@@ -146,6 +172,16 @@ const BookingHistory = () => {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {bookings.length > 0 && (
+        <div className="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+          <Pagination
+            pagination={pagination}
+            onPageChange={handlePageChange}
+            onLimitChange={handleLimitChange}
+          />
         </div>
       )}
     </div>

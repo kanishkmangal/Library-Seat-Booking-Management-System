@@ -5,7 +5,7 @@ export const generateBookingId = () => {
   return `BK${Date.now()}${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
 };
 
-export const checkSeatAvailability = async (seatIds, startDate, endDate) => {
+export const checkSeatAvailability = async (seatIds, startDate, endDate, userGender) => {
   const overlappingBookings = await Booking.find({
     status: 'active',
     seats: { $in: seatIds },
@@ -25,6 +25,9 @@ export const checkSeatAvailability = async (seatIds, startDate, endDate) => {
   }
 
   const seats = await Seat.find({ _id: { $in: seatIds } });
+
+  // Gender check removed - all users can book any seat
+
   const lockedSeats = seats.filter((seat) => seat.status === 'locked');
 
   if (lockedSeats.length > 0) {

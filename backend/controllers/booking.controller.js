@@ -76,17 +76,31 @@ export const getUserBookings = async (req, res, next) => {
   try {
     const userId = req.user._id;
     const { status } = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
     const query = { user: userId };
     if (status) {
       query.status = status;
     }
 
+    const total = await Booking.countDocuments(query);
     const bookings = await Booking.find(query)
       .populate('seats', 'seatNumber row column section')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
-    res.json({ bookings });
+    res.json({
+      bookings,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
     next(error);
   }

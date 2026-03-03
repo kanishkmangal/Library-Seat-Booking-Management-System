@@ -1,18 +1,30 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { adminAPI } from '../../services/api';
+import Pagination from '../../components/common/Pagination';
 
 const AdminReports = () => {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 20,
+    total: 0,
+    totalPages: 1,
+  });
   const [filters, setFilters] = useState({
     month: new Date().getMonth() + 1,
     year: new Date().getFullYear(),
   });
 
   useEffect(() => {
-    loadReport();
+    // Reset to page 1 when filters change
+    setPagination((prev) => ({ ...prev, page: 1 }));
   }, [filters]);
+
+  useEffect(() => {
+    loadReport();
+  }, [filters, pagination.page, pagination.limit]);
 
   const loadReport = async () => {
     try {
@@ -20,13 +32,24 @@ const AdminReports = () => {
       const response = await adminAPI.getMonthlyReport({
         month: filters.month,
         year: filters.year,
+        page: pagination.page,
+        limit: pagination.limit,
       });
       setReport(response.data);
+      setPagination(response.data.pagination);
     } catch (error) {
       console.error('Failed to load report:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePageChange = (newPage) => {
+    setPagination((prev) => ({ ...prev, page: newPage }));
+  };
+
+  const handleLimitChange = (newLimit) => {
+    setPagination((prev) => ({ ...prev, limit: newLimit, page: 1 }));
   };
 
   if (loading) {
@@ -127,6 +150,16 @@ const AdminReports = () => {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            )}
+
+            {report.bookings.length > 0 && (
+              <div className="mt-4 border-t dark:border-gray-700 pt-4">
+                <Pagination
+                  pagination={pagination}
+                  onPageChange={handlePageChange}
+                  onLimitChange={handleLimitChange}
+                />
               </div>
             )}
           </div>

@@ -1,9 +1,16 @@
 import { useState, useEffect } from 'react';
 import { adminAPI, seatAPI } from '../../services/api';
+import Pagination from '../../components/common/Pagination';
 
 const AdminSeats = () => {
   const [seats, setSeats] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 20,
+    total: 0,
+    totalPages: 1,
+  });
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showBulkForm, setShowBulkForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -17,17 +24,30 @@ const AdminSeats = () => {
 
   useEffect(() => {
     loadSeats();
-  }, []);
+  }, [pagination.page, pagination.limit]);
 
   const loadSeats = async () => {
     try {
-      const response = await seatAPI.getAll();
+      setLoading(true);
+      const response = await seatAPI.getAll({
+        page: pagination.page,
+        limit: pagination.limit,
+      });
       setSeats(response.data.seats);
+      setPagination(response.data.pagination);
     } catch (error) {
       console.error('Failed to load seats:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePageChange = (newPage) => {
+    setPagination((prev) => ({ ...prev, page: newPage }));
+  };
+
+  const handleLimitChange = (newLimit) => {
+    setPagination((prev) => ({ ...prev, limit: newLimit, page: 1 }));
   };
 
   const handleCreate = async (e) => {
@@ -57,7 +77,7 @@ const AdminSeats = () => {
           const [seatNumber, row, column, section, status] = line.split(',');
           if (!seatNumber || !row || !column || !section) return null;
           return {
-            seatNumber: seatNumber.trim(),
+            seatNumber: parseInt(seatNumber.trim()),
             row: row.trim(),
             column: parseInt(column.trim()),
             section: section.trim(),
@@ -160,10 +180,10 @@ const AdminSeats = () => {
             <form onSubmit={handleCreate}>
               <div className="space-y-4">
                 <input
-                  type="text"
-                  placeholder="Seat Number (e.g., A1)"
+                  type="number"
+                  placeholder="Seat Number (e.g., 1)"
                   value={formData.seatNumber}
-                  onChange={(e) => setFormData({ ...formData, seatNumber: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, seatNumber: parseInt(e.target.value) || '' })}
                   required
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
                 />
@@ -289,12 +309,25 @@ const AdminSeats = () => {
                     <select
                       value={seat.status}
                       onChange={(e) => handleUpdate(seat._id, { status: e.target.value })}
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                        seat.status
-                      )} border-0`}
+                      className={`
+                        px-3 py-1 rounded-full text-xs font-medium border-0 outline-none
+                        ${getStatusColor(seat.status)}
+                        bg-white text-gray-800
+                        dark:bg-gray-800 dark:text-gray-200
+                      `}
                     >
-                      <option value="available">Available</option>
-                      <option value="locked">Locked</option>
+                      <option
+                        value="available"
+                        className="bg-white text-gray-800 dark:bg-gray-800 dark:text-gray-200"
+                      >
+                        Available
+                      </option>
+                      <option
+                        value="locked"
+                        className="bg-white text-gray-800 dark:bg-gray-800 dark:text-gray-200"
+                      >
+                        Locked
+                      </option>
                     </select>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -319,6 +352,11 @@ const AdminSeats = () => {
             </tbody>
           </table>
         </div>
+        <Pagination
+          pagination={pagination}
+          onPageChange={handlePageChange}
+          onLimitChange={handleLimitChange}
+        />
       </div>
     </div>
   );

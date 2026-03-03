@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { format } from 'date-fns';
+import { useAuth } from '../../contexts/AuthContext';
 import { seatAPI, bookingAPI } from '../../services/api';
 import { useToast } from '../../contexts/ToastContext';
 import SeatGrid from '../../components/booking/SeatGrid';
 import BookingSummary from '../../components/booking/BookingSummary';
 
 const SeatSelection = () => {
+  const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -84,6 +86,8 @@ const SeatSelection = () => {
       showToast('Seat is locked for maintenance', 'warning');
       return;
     }
+
+    // Gender check removed - all users can book any seat
 
     // ✅ Using Set-based logic to guarantee uniqueness and toggle behavior
     // ✅ Move side effects OUT of the state updater
@@ -225,6 +229,7 @@ const SeatSelection = () => {
                 selectedSeats={Array.from(selectedSeats)}
                 onSeatSelect={handleSeatSelect}
                 date={selectedDate}
+                userGender={user?.gender}
               />
             )}
           </div>
