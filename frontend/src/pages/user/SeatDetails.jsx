@@ -18,6 +18,7 @@ const SeatDetails = () => {
             name: '',
             fatherName: '',
             contactNumber: '',
+            examPreparingFor: '',
             address: '',
         })) || []
     );
@@ -46,7 +47,7 @@ const SeatDetails = () => {
 
     const validate = () => {
         for (const detail of details) {
-            if (!detail.name.trim() || !detail.fatherName.trim() || !detail.contactNumber.trim() || !detail.address.trim()) {
+            if (!detail.name.trim() || !detail.fatherName.trim() || !detail.contactNumber.trim() || !detail.examPreparingFor.trim() || !detail.address.trim()) {
                 showToast('Please fill all fields for all seats', 'error');
                 return false;
             }
@@ -69,6 +70,7 @@ const SeatDetails = () => {
                     name: d.name.trim(),
                     fatherName: d.fatherName.trim(),
                     contactNumber: d.contactNumber.trim(),
+                    examPreparingFor: d.examPreparingFor.trim(),
                     address: d.address.trim(),
                 })),
                 startDate,
@@ -133,6 +135,18 @@ const SeatDetails = () => {
                                         onChange={(e) => handleInputChange(index, 'contactNumber', e.target.value)}
                                         placeholder="10-digit mobile number"
                                         maxLength="10"
+                                        className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Exam You Are Preparing For</label>
+                                    <input
+                                        type="text"
+                                        value={seat.examPreparingFor}
+                                        onChange={(e) => handleInputChange(index, 'examPreparingFor', e.target.value)}
+                                        placeholder="e.g., UPSC, SSC, JEE, NEET, Banking, etc."
                                         className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                         required
                                     />

@@ -105,6 +105,7 @@ const BookingConfirmation = () => {
                     <p><span className="font-medium">Passenger:</span> {item.name}</p>
                     <p><span className="font-medium">Father:</span> {item.fatherName}</p>
                     <p><span className="font-medium">Contact:</span> {item.contactNumber}</p>
+                    <p><span className="font-medium">Exam:</span> {item.examPreparingFor}</p>
                   </div>
                 </div>
               ))}

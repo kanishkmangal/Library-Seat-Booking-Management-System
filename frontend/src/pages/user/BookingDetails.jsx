@@ -152,6 +152,10 @@ const BookingDetails = () => {
                                             <span className="font-medium text-gray-900 dark:text-gray-100">{item.contactNumber}</span>
                                         </div>
                                         <div className="flex flex-col">
+                                            <span className="text-xs text-gray-400 font-bold uppercase tracking-tighter">Exam</span>
+                                            <span className="font-medium text-gray-900 dark:text-gray-100">{item.examPreparingFor}</span>
+                                        </div>
+                                        <div className="flex flex-col">
                                             <span className="text-xs text-gray-400 font-bold uppercase tracking-tighter">Address</span>
                                             <span className="font-medium text-gray-900 dark:text-gray-100 leading-relaxed">{item.address}</span>
                                         </div>

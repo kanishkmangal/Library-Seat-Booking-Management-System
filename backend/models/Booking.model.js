@@ -22,6 +22,7 @@ const bookingSchema = new mongoose.Schema(
         name: { type: String, required: true },
         fatherName: { type: String, required: true },
         contactNumber: { type: String, required: true },
+        examPreparingFor: { type: String, required: true },
         address: { type: String, required: true },
       },
     ],

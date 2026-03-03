@@ -51,13 +51,19 @@ export const createBooking = async (req, res, next) => {
     const booking = new Booking({
       bookingId,
       user: userId,
-      seats: seatDetails.map(d => ({
-        seat: d.seatId,
-        name: d.name,
-        fatherName: d.fatherName,
-        contactNumber: d.contactNumber,
-        address: d.address
-      })),
+      seats: seatDetails.map(d => {
+        if (!d.examPreparingFor || !d.examPreparingFor.trim()) {
+          throw { status: 400, message: 'Exam clarification is required for all seats' };
+        }
+        return {
+          seat: d.seatId,
+          name: d.name,
+          fatherName: d.fatherName,
+          contactNumber: d.contactNumber,
+          examPreparingFor: d.examPreparingFor.trim(),
+          address: d.address
+        };
+      }),
       startDate: start,
       endDate: end,
       durationMonths,

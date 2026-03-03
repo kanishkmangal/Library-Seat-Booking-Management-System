@@ -141,7 +141,7 @@ const BookingHistory = () => {
                     <span
                       key={item.seat._id}
                       className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 rounded-full text-sm"
-                      title={`${item.name} (${item.contactNumber})`}
+                      title={`${item.name} (${item.contactNumber}) - ${item.examPreparingFor}`}
                     >
                       {item.seat.seatNumber} ({item.seat.genderType?.toUpperCase() || item.seat.section})
                     </span>
