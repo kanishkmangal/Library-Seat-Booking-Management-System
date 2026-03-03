@@ -129,7 +129,7 @@ const BookingDetails = () => {
 
                     {/* Seats & Passenger Details */}
                     <div className="space-y-6">
-                        <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest">Passenger & Seat Details</h2>
+                        <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest">Seat Details</h2>
                         <div className="grid sm:grid-cols-2 gap-4">
                             {booking.seats.filter(item => item.seat).map((item) => (
                                 <div key={item.seat._id} className="p-5 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
