@@ -6,6 +6,8 @@ import {
   refreshToken,
   logout,
   getProfile,
+  forgotPassword,
+  resetPassword,
 } from '../controllers/auth.controller.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 
@@ -46,6 +48,8 @@ router.use((err, req, res, next) => {
 router.post('/refresh-token', refreshToken);
 router.post('/logout', authenticate, logout);
 router.get('/profile', authenticate, getProfile);
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password/:token', resetPassword);
 
 export default router;
 

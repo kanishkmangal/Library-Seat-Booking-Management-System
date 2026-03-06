@@ -12,6 +12,8 @@ import BookingHistory from './pages/user/BookingHistory';
 import BookingConfirmation from './pages/user/BookingConfirmation';
 import SeatDetails from './pages/user/SeatDetails';
 import BookingDetails from './pages/user/BookingDetails';
+import ForgotPassword from './pages/auth/ForgotPassword';
+import ResetPassword from './pages/auth/ResetPassword';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminSeats from './pages/admin/AdminSeats';
 import AdminBookings from './pages/admin/AdminBookings';
@@ -53,6 +55,8 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route
               path="/booking"
               element={
