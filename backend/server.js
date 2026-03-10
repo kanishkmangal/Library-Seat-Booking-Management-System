@@ -22,6 +22,7 @@ const corsOptions = {
       'http://localhost:5173',
       'http://127.0.0.1:3000',
       'http://127.0.0.1:5173',
+      'library-seat-booking-management-sys.vercel.app',
     ];
     
     if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
