@@ -82,7 +82,7 @@ export const authAPI = {
       if (error.response) {
         throw error;
       }
-      throw new Error('Network error. Please check your connection.');
+      
     });
   },
   logout: () => api.post('/auth/logout'),
