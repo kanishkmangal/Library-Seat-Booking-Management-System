@@ -138,39 +138,6 @@ npm run dev
 
 The frontend will run on `http://localhost:3000`
 
-## Creating an Admin User
-
-To create an admin user, you have several options:
-
-1. **Using the provided script (Recommended):**
-   ```bash
-   cd backend
-   npm run create-admin [email] [password] [name]
-   ```
-   Example:
-   ```bash
-   npm run create-admin admin@library.com admin123 "Admin User"
-   ```
-   If no arguments are provided, it will use default values:
-   - Email: admin@example.com
-   - Password: admin123
-   - Name: Admin User
-
-2. **Using MongoDB directly:**
-   - Connect to your MongoDB database
-   - Insert a user document with `role: 'admin'`:
-   ```javascript
-   db.users.insertOne({
-     name: "Admin User",
-     email: "admin@example.com",
-     password: "$2a$12$hashedpassword", // Use bcrypt to hash password
-     role: "admin"
-   })
-   ```
-
-3. **Using the registration endpoint:**
-   - Register a user normally through the frontend
-   - Update the user's role in MongoDB to 'admin'
 
 ## API Endpoints
 
