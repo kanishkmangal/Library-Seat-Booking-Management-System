@@ -66,11 +66,11 @@ bookingSchema.pre('save', async function (next) {
     const overlappingBookings = await Booking.find({
       _id: { $ne: this._id },
       status: 'active',
-      seats: { $in: this.seats.map(s => s.seat) },
+      'seats.seat': { $in: this.seats.map(s => s.seat) },
       $or: [
         {
-          startDate: { $lt: this.endDate },
-          endDate: { $gt: this.startDate },
+          startDate: { $lte: this.endDate },
+          endDate: { $gte: this.startDate },
         },
       ],
     });

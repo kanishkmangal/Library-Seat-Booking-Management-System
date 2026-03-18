@@ -46,10 +46,9 @@ export const getSeatLayout = async (req, res, next) => {
     // Get all seats
     const seats = await Seat.find({ isActive: true }).sort({ row: 1, column: 1 });
 
-    // Get bookings for the date
+    // Get bookings for the date (any booking ending on or after today)
     const bookings = await Booking.find({
       status: 'active',
-      startDate: { $lte: queryDate },
       endDate: { $gte: queryDate },
     }).populate('seats.seat');
 
