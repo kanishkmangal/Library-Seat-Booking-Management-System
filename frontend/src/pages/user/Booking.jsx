@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { seatAPI, bookingAPI } from '../../services/api';
 import SeatGrid from '../../components/booking/SeatGrid';
+import BottomSheet from '../../components/common/BottomSheet';
 
 const Booking = () => {
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
@@ -105,53 +106,59 @@ const Booking = () => {
         </div>
 
         <div className="md:col-span-1">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 sticky top-4">
-            <h2 className="text-xl font-semibold mb-4">Booking Details</h2>
+          <BottomSheet 
+            isOpen={selectedSeats.length > 0} 
+            selectedCount={selectedSeats.length}
+            totalAmount={calculateTotal()}
+          >
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-semibold mb-4">Booking Details</h2>
 
-            {error && (
-              <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 text-red-700 dark:text-red-400 rounded text-sm">
-                {error}
-              </div>
-            )}
+              {error && (
+                <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 text-red-700 dark:text-red-400 rounded text-sm">
+                  {error}
+                </div>
+              )}
 
-            <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-2">Duration (Months)</label>
-                <select
-                  value={durationMonths}
-                  onChange={(e) => setDurationMonths(Number(e.target.value))}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              <form onSubmit={handleSubmit}>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-2">Duration (Months)</label>
+                  <select
+                    value={durationMonths}
+                    onChange={(e) => setDurationMonths(Number(e.target.value))}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  >
+                    <option value={1}>1 Month (30 Days)</option>
+                    <option value={2}>2 Months (60 Days)</option>
+                    <option value={3}>3 Months (90 Days)</option>
+                  </select>
+                </div>
+
+                <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <div className="flex justify-between mb-2">
+                    <span>Selected Seats:</span>
+                    <span className="font-semibold">{selectedSeats.length}</span>
+                  </div>
+                  <div className="flex justify-between mb-2">
+                    <span>Duration:</span>
+                    <span className="font-semibold">{durationMonths} month(s)</span>
+                  </div>
+                  <div className="flex justify-between text-lg font-bold pt-2 border-t border-gray-300 dark:border-gray-600">
+                    <span>Total:</span>
+                    <span>₹{calculateTotal()}</span>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading || selectedSeats.length === 0}
+                  className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <option value={1}>1 Month (30 Days)</option>
-                  <option value={2}>2 Months (60 Days)</option>
-                  <option value={3}>3 Months (90 Days)</option>
-                </select>
-              </div>
-
-              <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <div className="flex justify-between mb-2">
-                  <span>Selected Seats:</span>
-                  <span className="font-semibold">{selectedSeats.length}</span>
-                </div>
-                <div className="flex justify-between mb-2">
-                  <span>Duration:</span>
-                  <span className="font-semibold">{durationMonths} month(s)</span>
-                </div>
-                <div className="flex justify-between text-lg font-bold pt-2 border-t border-gray-300 dark:border-gray-600">
-                  <span>Total:</span>
-                  <span>₹{calculateTotal()}</span>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading || selectedSeats.length === 0}
-                className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? 'Processing...' : 'Confirm Booking'}
-              </button>
-            </form>
-          </div>
+                  {loading ? 'Processing...' : 'Confirm Booking'}
+                </button>
+              </form>
+            </div>
+          </BottomSheet>
         </div>
       </div>
     </div>

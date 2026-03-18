@@ -11,8 +11,8 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white dark:bg-gray-800 shadow-md">
-      <div className="container mx-auto px-4">
+    <nav className="bg-white dark:bg-gray-800 shadow-md w-full">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="text-xl font-bold text-blue-600 dark:text-blue-400">
             Library Seat Booking

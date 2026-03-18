@@ -63,8 +63,8 @@ const SeatGrid = ({ seats = [], selectedSeats = [], onSeatSelect, userGender }) 
   };
 
   return (
-    <div className="w-full max-w-[1200px] mx-auto px-4">
-      <div className="flex flex-col space-y-4">
+    <div className="w-full max-w-6xl mx-auto px-2 sm:px-4 overflow-x-hidden">
+      <div className="flex flex-col space-y-4 md:space-y-6">
         {/* Screen */}
         <div className="w-full text-center mb-8">
           <div className="bg-gray-200 dark:bg-gray-800 h-10 rounded-lg flex items-center justify-center text-sm font-medium text-gray-500 tracking-widest uppercase">
@@ -77,57 +77,52 @@ const SeatGrid = ({ seats = [], selectedSeats = [], onSeatSelect, userGender }) 
           const isRowH = row === 'H';
 
           return (
-            <div key={`row-${row}`} className="grid grid-cols-[30px_1fr] items-center gap-4">
-              <span className="text-sm font-bold text-gray-400">{row}</span>
+            <div key={`row-${row}`} className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4 md:justify-center w-full">
+              <span className="text-sm font-bold text-gray-400 w-6 shrink-0 hidden md:block">{row}</span>
 
-              <div
-                className="grid gap-2"
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: isRowA
-                    ? 'repeat(18, 1fr)'
-                    : 'repeat(8, 1fr) 60px repeat(8, 1fr)'
-                }}
-              >
-                {/* Row A: Continuous Block */}
-                {isRowA ? (
-                  <>
-                    {[...left, ...right]
+              <div className="flex flex-col sm:flex-row w-full justify-center gap-2 sm:gap-6 md:gap-12 pl-2 md:pl-0">
+                {/* Mobile Row Letter indicator */}
+                <span className="text-sm font-bold text-gray-400 md:hidden mb-1">Row {row}</span>
+
+                {/* Left Block or Continuous Row A */}
+                <div className={`grid gap-1.5 sm:gap-2 ${isRowA ? 'grid-cols-6 sm:grid-cols-9 lg:grid-cols-[repeat(18,minmax(32px,1fr))] w-full' : 'grid-cols-4 sm:grid-cols-8 flex-1'}`}>
+                  {isRowA ? (
+                    // Row A logic: all seats together
+                    [...left, ...right]
                       .sort((a, b) => a.seatNumber - b.seatNumber)
                       .map((seat) => (
                         <button
                           key={seat._id}
                           onClick={() => handleSeatClick(seat)}
-                          className={`relative aspect-square rounded-md text-[10px] md:text-xs font-bold shadow-sm flex items-center justify-center ${getClass(seat)}`}
+                          className={`relative aspect-square rounded-md text-[10px] md:text-xs font-bold shadow-sm flex items-center justify-center min-w-[32px] min-h-[32px] ${getClass(seat)}`}
                           disabled={seat.status === 'booked' || seat.status === 'locked'}
                           title={`Seat ${seat.seatNumber} (${seat.genderType})`}
                         >
                           {seat.seatNumber}
                         </button>
-                      ))}
-                  </>
-                ) : (
-                  <>
-                    {/* Left Block */}
-                    {Array.from({ length: 8 }).map((_, i) => {
+                      ))
+                  ) : (
+                    // Standard Row Left Block: exactly 8 seats max
+                    Array.from({ length: 8 }).map((_, i) => {
                       const seat = left.find(s => s.column === i + 1);
                       return seat ? (
                         <button
                           key={seat._id}
                           onClick={() => handleSeatClick(seat)}
-                          className={`relative aspect-square rounded-md text-[10px] md:text-xs font-bold shadow-sm flex items-center justify-center ${getClass(seat)}`}
+                          className={`relative aspect-square rounded-md text-[10px] md:text-xs font-bold shadow-sm flex items-center justify-center min-w-[32px] min-h-[32px] ${getClass(seat)}`}
                           disabled={seat.status === 'booked' || seat.status === 'locked'}
                           title={`Seat ${seat.seatNumber} (${seat.genderType})`}
                         >
                           {seat.seatNumber}
                         </button>
-                      ) : <div key={`empty-left-${i}`} className="aspect-square" />;
-                    })}
+                      ) : <div key={`empty-left-${i}`} className="aspect-square min-w-[32px]" />;
+                    })
+                  )}
+                </div>
 
-                    {/* Aisle - Spacing Only */}
-                    <div />
-
-                    {/* Right Block */}
+                {/* Right Block (Hidden for Row A since it's continuous) */}
+                {!isRowA && (
+                  <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5 sm:gap-2 flex-1 mt-2 sm:mt-0">
                     {Array.from({ length: 8 }).map((_, i) => {
                       // Row H offset: Empty column at the start of Right block
                       const dataColumnToFind = isRowH ? i : i + 1;
@@ -136,15 +131,15 @@ const SeatGrid = ({ seats = [], selectedSeats = [], onSeatSelect, userGender }) 
                         <button
                           key={seat._id}
                           onClick={() => handleSeatClick(seat)}
-                          className={`relative aspect-square rounded-md text-[10px] md:text-xs font-bold shadow-sm flex items-center justify-center ${getClass(seat)}`}
+                          className={`relative aspect-square rounded-md text-[10px] md:text-xs font-bold shadow-sm flex items-center justify-center min-w-[32px] min-h-[32px] ${getClass(seat)}`}
                           disabled={seat.status === 'booked' || seat.status === 'locked'}
                           title={`Seat ${seat.seatNumber} (${seat.genderType})`}
                         >
                           {seat.seatNumber}
                         </button>
-                      ) : <div key={`empty-right-${i}`} className="aspect-square" />;
+                      ) : <div key={`empty-right-${i}`} className="aspect-square min-w-[32px]" />;
                     })}
-                  </>
+                  </div>
                 )}
               </div>
             </div>

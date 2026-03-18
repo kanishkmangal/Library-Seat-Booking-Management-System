@@ -5,8 +5,8 @@ const Home = () => {
   const { user } = useAuth();
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="text-center py-12">
+    <div className="w-full max-w-4xl mx-auto flex flex-col items-center">
+      <div className="text-center py-12 w-full">
         <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
           Library Seat Booking System
         </h1>
