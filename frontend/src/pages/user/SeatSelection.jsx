@@ -176,7 +176,7 @@ const SeatSelection = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-24 lg:pb-6">
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="w-full max-w-[1400px] mx-auto px-6 lg:px-10 py-6">
 
         {/* HEADER */}
         <div className="mb-6">
@@ -208,8 +208,8 @@ const SeatSelection = () => {
         </div>
 
         {/* CONTENT */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-8">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
             {loading && <SeatGridSkeleton />}
 
             {!loading && seats.length === 0 && (
