@@ -74,9 +74,9 @@ const Login = () => {
 
         {backendStatus && !backendStatus.success && (
           <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 text-red-700 dark:text-red-400 rounded">
-            <div className="font-semibold mb-1">⚠️ Backend Connection Issue</div>
-            <div className="text-sm">{backendStatus.message}</div>
-            <div className="text-xs mt-2">
+            {/* <div className="font-semibold mb-1">⚠️ Backend Connection Issue</div>
+            <div className="text-sm">{backendStatus.message}</div> */}
+            {/* <div className="text-xs mt-2">
               <p>To fix this:</p>
               <ol className="list-decimal list-inside ml-2 space-y-1">
                 <li>Navigate to the <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">backend</code> folder</li>
@@ -84,8 +84,8 @@ const Login = () => {
                 <li>Ensure MongoDB is running</li>
                 <li>Check that the server starts on port 5000</li>
               </ol>
-            </div>
-          </div>
+            </div> */}
+          </div> 
         )}
 
         {error && backendStatus?.success && (
