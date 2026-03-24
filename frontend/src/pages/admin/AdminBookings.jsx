@@ -91,7 +91,7 @@ const AdminBookings = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="w-full max-w-2xl sm:max-w-3xl md:max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">All Bookings</h1>
 
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">

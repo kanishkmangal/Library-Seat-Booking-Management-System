@@ -154,7 +154,7 @@ const AdminSeats = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="w-full max-w-2xl sm:max-w-3xl md:max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Manage Seats</h1>
         <div className="space-x-2">
@@ -175,7 +175,7 @@ const AdminSeats = () => {
 
       {showCreateForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl">
             <h2 className="text-xl font-semibold mb-4">Create Seat</h2>
             <form onSubmit={handleCreate}>
               <div className="space-y-4">

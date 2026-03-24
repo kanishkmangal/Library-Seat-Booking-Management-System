@@ -11,7 +11,7 @@ const DateSelection = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto mt-12">
+    <div className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl mx-auto mt-12">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
         <h1 className="text-3xl font-bold mb-2">Select Date</h1>
         <p className="text-gray-600 dark:text-gray-400 mb-8">

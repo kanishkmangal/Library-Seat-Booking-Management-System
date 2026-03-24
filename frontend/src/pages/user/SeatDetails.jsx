@@ -88,7 +88,7 @@ const SeatDetails = () => {
     };
 
     return (
-        <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="w-full max-w-xl sm:max-w-2xl md:max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold mb-8">Passenger Details</h1>
 
             <div className="grid lg:grid-cols-3 gap-8">

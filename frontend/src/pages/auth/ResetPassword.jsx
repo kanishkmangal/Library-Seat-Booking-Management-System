@@ -33,7 +33,7 @@ const ResetPassword = () => {
 
     if (success) {
         return (
-            <div className="max-w-md mx-auto mt-12">
+            <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto mt-12">
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 text-center">
                     <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,7 +50,7 @@ const ResetPassword = () => {
     }
 
     return (
-        <div className="max-w-md mx-auto mt-12">
+        <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto mt-12">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
                 <h2 className="text-2xl font-bold mb-6 text-center">Reset Password</h2>
 

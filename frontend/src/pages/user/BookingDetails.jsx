@@ -59,7 +59,7 @@ const BookingDetails = () => {
     const isNewBooking = location.state?.newBooking;
 
     return (
-        <div className="max-w-3xl mx-auto px-4 py-8">
+        <div className="w-full max-w-lg sm:max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto px-4 py-8">
             {isNewBooking && (
                 <div className="mb-8 text-center animate-in fade-in slide-in-from-top-4 duration-700">
                     <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
