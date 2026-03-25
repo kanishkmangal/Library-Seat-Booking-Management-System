@@ -88,11 +88,11 @@ const Login = () => {
           </div> 
         )}
 
-        {error && backendStatus?.success && (
+        {/* {error && backendStatus?.success && (
           <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 text-red-700 dark:text-red-400 rounded">
             {error}
           </div>
-        )}
+        )} */}
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
