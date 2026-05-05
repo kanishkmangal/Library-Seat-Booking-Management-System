@@ -190,6 +190,43 @@ export const cancelBookingAdmin = async (req, res, next) => {
   }
 };
 
+// Dynamically marks expired active bookings as completed and returns them
+export const getCompletedBookings = async (req, res, next) => {
+  try {
+    const now = new Date();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    // Auto-complete any active bookings whose endDate has passed
+    await Booking.updateMany(
+      { status: 'active', endDate: { $lt: now } },
+      { $set: { status: 'completed' } }
+    );
+
+    const total = await Booking.countDocuments({ status: 'completed' });
+    const bookings = await Booking.find({ status: 'completed' })
+      .populate('user', 'name email')
+      .populate('seats.seat', 'seatNumber row section')
+      .sort({ endDate: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    res.json({
+      bookings,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 // Reports
 export const getMonthlyReport = async (req, res, next) => {
   try {
@@ -257,11 +294,20 @@ export const getMonthlyReport = async (req, res, next) => {
 
 export const getDashboardStats = async (req, res, next) => {
   try {
+    const now = new Date();
+
+    // Auto-complete expired active bookings on every dashboard load
+    await Booking.updateMany(
+      { status: 'active', endDate: { $lt: now } },
+      { $set: { status: 'completed' } }
+    );
+
     const totalUsers = await User.countDocuments({ role: 'user' });
     const totalSeats = await Seat.countDocuments({ isActive: true });
     const availableSeats = await Seat.countDocuments({ isActive: true, status: 'available' });
     const lockedSeats = await Seat.countDocuments({ status: 'locked' });
     const activeBookings = await Booking.countDocuments({ status: 'active' });
+    const completedBookings = await Booking.countDocuments({ status: 'completed' });
     const totalBookings = await Booking.countDocuments();
 
     const currentMonth = new Date();
@@ -314,6 +360,7 @@ export const getDashboardStats = async (req, res, next) => {
       availableSeats,
       lockedSeats,
       activeBookings,
+      completedBookings,
       totalBookings,
       monthlyRevenue: monthlyRevenue[0]?.total || 0,
       currentlyBooked,

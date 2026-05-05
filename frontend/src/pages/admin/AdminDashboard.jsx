@@ -29,7 +29,7 @@ const AdminDashboard = () => {
     { title: 'Total Seats', value: stats?.totalSeats || 0, color: 'green' },
     { title: 'Available Seats', value: stats?.availableSeats || 0, color: 'green' },
     { title: 'Locked Seats', value: stats?.lockedSeats || 0, color: 'gray' },
-    { title: 'Active Bookings', value: stats?.activeBookings || 0, color: 'purple' },
+    { title: 'Completed Bookings', value: stats?.completedBookings || 0, color: 'purple' },
     { title: 'Currently Booked', value: stats?.currentlyBooked || 0, color: 'orange' },
     { title: 'Occupancy Rate', value: `${stats?.occupancyRate || 0}%`, color: 'indigo' },
     { title: 'Monthly Revenue', value: `₹${stats?.monthlyRevenue || 0}`, color: 'indigo' },

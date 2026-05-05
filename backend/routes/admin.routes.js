@@ -6,6 +6,7 @@ import {
   deleteSeat,
   getAllBookings,
   cancelBookingAdmin,
+  getCompletedBookings,
   getMonthlyReport,
   getDashboardStats,
   forceReleaseSeat,
@@ -25,6 +26,7 @@ router.patch('/seats/:id', updateSeat);
 router.delete('/seats/:id', deleteSeat);
 
 // Booking management
+router.get('/bookings/completed', getCompletedBookings);
 router.get('/bookings', getAllBookings);
 router.patch('/bookings/:id/cancel', cancelBookingAdmin);
 

@@ -115,6 +115,7 @@ export const adminAPI = {
   deleteSeat: (id) => api.delete(`/admin/seats/${id}`),
   // Bookings
   getAllBookings: (params) => api.get('/admin/bookings', { params }),
+  getCompletedBookings: (params) => api.get('/admin/bookings/completed', { params }),
   cancelBooking: (id) => api.patch(`/admin/bookings/${id}/cancel`),
   // Reports
   getMonthlyReport: (params) => api.get('/admin/reports/monthly', { params }),
