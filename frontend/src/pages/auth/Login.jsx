@@ -15,7 +15,7 @@ const Login = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setError('');
+    // Removed setError('') to prevent premature clearing while typing
   };
 
   const handleSubmit = async (e) => {
@@ -44,10 +44,12 @@ const Login = () => {
       } else {
         const errorMsg = result.message || 'Login failed. Please try again.';
         setError(errorMsg);
-        showToast(errorMsg, 'error');
+        showToast(errorMsg, 'error', 5000); // 5-second timeout for error toasts
       }
     } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
+      const errorMsg = 'An unexpected error occurred. Please try again.';
+      setError(errorMsg);
+      showToast(errorMsg, 'error', 5000);
       console.error('Login error:', err);
     } finally {
       setLoading(false);
@@ -60,8 +62,15 @@ const Login = () => {
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 text-red-700 dark:text-red-400 rounded">
-            {error}
+          <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 text-red-700 dark:text-red-400 rounded flex justify-between items-center">
+            <span>{error}</span>
+            <button 
+              onClick={() => setError('')} 
+              className="text-red-700 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 font-bold ml-4"
+              aria-label="Dismiss error"
+            >
+              &times;
+            </button>
           </div>
         )}
 
