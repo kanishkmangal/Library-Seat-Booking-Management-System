@@ -7,8 +7,19 @@ const Register = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
+
+  const validatePassword = (pwd) => ({
+    length: pwd.length >= 8,
+    uppercase: /[A-Z]/.test(pwd),
+    lowercase: /[a-z]/.test(pwd),
+    number: /[0-9]/.test(pwd),
+    special: /[^A-Za-z0-9]/.test(pwd),
+  });
+
+  const pwdRules = validatePassword(formData.password);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -20,8 +31,17 @@ const Register = () => {
     setError('');
     setLoading(true);
 
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+    const isPasswordValid = Object.values(pwdRules).every(Boolean);
+
+    if (!isPasswordValid) {
+      const missing = [];
+      if (!pwdRules.length) missing.push('8 characters');
+      if (!pwdRules.uppercase) missing.push('uppercase letter');
+      if (!pwdRules.lowercase) missing.push('lowercase letter');
+      if (!pwdRules.number) missing.push('number');
+      if (!pwdRules.special) missing.push('special character');
+      
+      setError(`Password missing: ${missing.join(', ')}`);
       setLoading(false);
       return;
     }
@@ -81,8 +101,9 @@ const Register = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
+                onFocus={() => setPasswordFocused(true)}
+                onBlur={() => setPasswordFocused(false)}
                 required
-                minLength={6}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white pr-10"
               />
               <button
@@ -103,7 +124,30 @@ const Register = () => {
                 )}
               </button>
             </div>
-            <p className="mt-1 text-xs text-gray-500">Minimum 6 characters</p>
+            
+            {/* Dynamic Password Validation Rules */}
+            {(passwordFocused || formData.password.length > 0) && (
+              <div className="mt-3 text-sm text-gray-600 dark:text-gray-400 space-y-1.5 bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg border border-gray-200 dark:border-gray-600 transition-all duration-300">
+                <p className="font-medium text-gray-700 dark:text-gray-300 mb-2">Password must contain:</p>
+                <ul className="space-y-1.5">
+                  <li className={`flex items-center gap-2 ${pwdRules.length ? 'text-green-600 dark:text-green-400 font-medium' : ''}`}>
+                    <span>{pwdRules.length ? '✔' : '❌'}</span> At least 8 characters
+                  </li>
+                  <li className={`flex items-center gap-2 ${pwdRules.uppercase ? 'text-green-600 dark:text-green-400 font-medium' : ''}`}>
+                    <span>{pwdRules.uppercase ? '✔' : '❌'}</span> At least 1 uppercase letter
+                  </li>
+                  <li className={`flex items-center gap-2 ${pwdRules.lowercase ? 'text-green-600 dark:text-green-400 font-medium' : ''}`}>
+                    <span>{pwdRules.lowercase ? '✔' : '❌'}</span> At least 1 lowercase letter
+                  </li>
+                  <li className={`flex items-center gap-2 ${pwdRules.number ? 'text-green-600 dark:text-green-400 font-medium' : ''}`}>
+                    <span>{pwdRules.number ? '✔' : '❌'}</span> At least 1 number
+                  </li>
+                  <li className={`flex items-center gap-2 ${pwdRules.special ? 'text-green-600 dark:text-green-400 font-medium' : ''}`}>
+                    <span>{pwdRules.special ? '✔' : '❌'}</span> At least 1 special character
+                  </li>
+                </ul>
+              </div>
+            )}
           </div>
 
           <button

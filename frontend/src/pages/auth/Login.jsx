@@ -45,7 +45,7 @@ const Login = () => {
         const errorMsg = result.message || 'Login failed. Please try again.';
         setError(errorMsg);
         showToast(errorMsg, 'error', 5000); // 5-second timeout
-        setTimeout(() => setError(''), 5000); // Auto-clear inline error after 5s
+        // setTimeout(() => setError(''), 5000); // Auto-clear inline error after 5s
       }
     } catch (err) {
       const errorMsg = 'An unexpected error occurred. Please try again.';
