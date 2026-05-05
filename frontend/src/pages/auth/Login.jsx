@@ -9,22 +9,9 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [backendStatus, setBackendStatus] = useState(null);
   const { login } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // Check backend health on component mount
-    const checkHealth = async () => {
-      const health = await checkBackendHealth();
-      setBackendStatus(health);
-      if (!health.success) {
-        setError(health.message);
-      }
-    };
-    checkHealth();
-  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -72,27 +59,11 @@ const Login = () => {
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
 
-        {backendStatus && !backendStatus.success && (
-          <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 text-red-700 dark:text-red-400 rounded">
-            {/* <div className="font-semibold mb-1">⚠️ Backend Connection Issue</div>
-            <div className="text-sm">{backendStatus.message}</div> */}
-            {/* <div className="text-xs mt-2">
-              <p>To fix this:</p>
-              <ol className="list-decimal list-inside ml-2 space-y-1">
-                <li>Navigate to the <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">backend</code> folder</li>
-                <li>Run <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">npm run dev</code></li>
-                <li>Ensure MongoDB is running</li>
-                <li>Check that the server starts on port 5000</li>
-              </ol>
-            </div> */}
-          </div> 
-        )}
-
-        {/* {error && backendStatus?.success && (
+        {error && (
           <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 text-red-700 dark:text-red-400 rounded">
             {error}
           </div>
-        )} */}
+        )}
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
